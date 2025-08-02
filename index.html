@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sanjeev S. Godbole - Robotics Systems Engineer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #020617; /* Darker Slate Blue */
+            color: #e2e8f0; /* Light Slate Gray */
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+        }
+        .text-secondary { color: #94a3b8; } /* Medium Slate Gray */
+        .accent-color { color: #22d3ee; } /* Vibrant Cyan/Sky Blue */
+        .btn-primary {
+            background-color: transparent;
+            border: 1px solid #22d3ee;
+            color: #22d3ee;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: rgba(34, 211, 238, 0.1);
+            box-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
+        }
+        .card {
+            background-color: #0f172a; /* Dark Slate Blue */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 30px -15px rgba(2, 6, 23, 0.7);
+        }
+        .section-heading::after {
+            content: '';
+            display: block;
+            width: 100px;
+            height: 2px;
+            background-color: #22d3ee;
+            margin-top: 10px;
+        }
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        .nav-link::after {
+            content: '';
+            display: block;
+            width: 0;
+            height: 2px;
+            background: #22d3ee;
+            transition: width .3s;
+        }
+        .nav-link:hover::after, .nav-link.active::after {
+            width: 100%;
+        }
+        .nav-link.active {
+            color: #22d3ee;
+        }
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .typed-cursor {
+            opacity: 1;
+            animation: blink 0.7s infinite;
+        }
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        /* Mobile Menu Styles */
+        #mobile-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(2, 6, 23, 0.95);
+            backdrop-filter: blur(5px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.3s ease-in-out;
+            transform: translateX(100%);
+            z-index: 40;
+        }
+        #mobile-menu.active {
+            transform: translateX(0);
+        }
+        #mobile-menu a {
+            font-size: 1.5rem;
+            color: #e2e8f0;
+            padding: 1rem;
+            transition: color 0.3s;
+        }
+        #mobile-menu a:hover {
+            color: #22d3ee;
+        }
+        /* Hamburger Icon Animation */
+        #menu-btn {
+            z-index: 50;
+            position: relative;
+        }
+        .hamburger-top, .hamburger-middle, .hamburger-bottom {
+            position: absolute;
+            width: 24px;
+            height: 2px;
+            background: #e2e8f0;
+            transition: all 0.3s;
+        }
+        .hamburger-top { transform: translateY(-7px); }
+        .hamburger-bottom { transform: translateY(7px); }
+        .open .hamburger-top { transform: rotate(45deg) translateY(0px); }
+        .open .hamburger-middle { display: none; }
+        .open .hamburger-bottom { transform: rotate(-45deg) translateY(0px); }
+        
+        /* Modal Styles */
+        #modal-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        #modal-container.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        #modal-content {
+            background-color: #0f172a;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            max-width: 90%;
+            width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        #modal-container.show #modal-content {
+            transform: scale(1);
+        }
+        #modal-close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        #modal-close-btn:hover {
+            color: #22d3ee;
+        }
+    </style>
+</head>
+<body class="bg-slate-900">
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Sticky Navigation -->
+    <header class="bg-slate-900/80 backdrop-blur-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
+            <a href="#home" class="text-2xl font-bold accent-color">SG</a>
+            <div id="desktop-nav" class="hidden md:flex space-x-6 items-center">
+                <a href="#home" class="nav-link text-slate-300 hover:accent-color transition duration-300">Home</a>
+                <a href="#about" class="nav-link text-slate-300 hover:accent-color transition duration-300">About</a>
+                <a href="#experience" class="nav-link text-slate-300 hover:accent-color transition duration-300">Experience</a>
+                <a href="#projects" class="nav-link text-slate-300 hover:accent-color transition duration-300">Projects</a>
+                <a href="#certifications" class="nav-link text-slate-300 hover:accent-color transition duration-300">Certifications</a>
+                <a href="#contact" class="nav-link text-slate-300 hover:accent-color transition duration-300">Contact</a>
+            </div>
+            <!-- Hamburger Icon -->
+            <button id="menu-btn" class="md:hidden block h-6 w-6 focus:outline-none">
+                <span class="hamburger-top"></span>
+                <span class="hamburger-middle"></span>
+                <span class="hamburger-bottom"></span>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu">
+        <a href="#home" class="mobile-nav-link">Home</a>
+        <a href="#about" class="mobile-nav-link">About</a>
+        <a href="#experience" class="mobile-nav-link">Experience</a>
+        <a href="#projects" class="mobile-nav-link">Projects</a>
+        <a href="#certifications" class="mobile-nav-link">Certifications</a>
+        <a href="#contact" class="mobile-nav-link">Contact</a>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal-container">
+        <div id="modal-content">
+            <i id="modal-close-btn" class="fas fa-times"></i>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <main class="container mx-auto px-4 sm:px-6">
+        <!-- Hero Section -->
+        <section id="home" class="min-h-screen flex flex-col justify-center">
+            <div class="max-w-4xl">
+                <p class="text-lg accent-color mb-4">Hi, my name is</p>
+                <h1 class="text-4xl sm:text-6xl lg:text-7xl font-bold text-slate-100">Sanjeev S. Godbole.</h1>
+                <h2 class="text-3xl sm:text-5xl lg:text-7xl font-bold text-secondary mt-2"><span id="typing-effect"></span></h2>
+                <p class="mt-6 max-w-2xl text-secondary">
+                    I'm a Robotics Systems Engineer with a passion for automation, integrating advanced vision systems, and optimizing electromechanical-software workflows to enhance efficiency and reliability.
+                </p>
+                <a href="#projects" class="btn-primary inline-block py-3 px-6 rounded-md mt-8 text-lg font-semibold">
+                    Check out my work!
+                </a>
+            </div>
+        </section>
+
+        <!-- About Me Section -->
+        <section id="about" class="py-20 fade-in-section">
+            <h2 class="section-heading text-3xl sm:text-4xl font-bold text-slate-100 mb-12">About Me</h2>
+            <div class="grid md:grid-cols-5 gap-10 items-center">
+                <div class="md:col-span-3 text-secondary space-y-4">
+                    <p>
+                        Hello! I'm Sanjeev, a Robotics Systems Engineer dedicated to creating innovative automation solutions. My journey in robotics began with a deep curiosity for how machines can interact with and improve our world. This led me to pursue a career focused on the intersection of hardware, software, and intelligent systems.
+                    </p>
+                    <p>
+                        Throughout my career, I've had the opportunity to work on diverse projects, from developing warehouse dimensioning systems to implementing vision-based detection for automotive parts. I thrive on tackling complex challenges and enjoy the entire process of bringing a robotic system to life—from initial concept and design to programming, integration, and final deployment.
+                    </p>
+                    <p class="mb-6 text-slate-300">
+                        Here are a few technologies I've been working with recently:
+                    </p>
+                    <ul class="grid grid-cols-2 gap-2 text-sm">
+                        <li class="flex items-center"><i class="fas fa-caret-right accent-color mr-2"></i>Python</li>
+                        <li class="flex items-center"><i class="fas fa-caret-right accent-color mr-2"></i>ROS / ROS 2</li>
+                        <li class="flex items-center"><i class="fas fa-caret-right accent-color mr-2"></i>MATLAB</li>
+                        <li class="flex items-center"><i class="fas fa-caret-right accent-color mr-2"></i>YOLOv8</li>
+                        <li class="flex items-center"><i class="fas fa-caret-right accent-color mr-2"></i>Vision Systems</li>
+                        <li class="flex items-center"><i class="fas fa-caret-right accent-color mr-2"></i>FANUC</li>
+                        <li class="flex items-center"><i class="fas fa-caret-right accent-color mr-2"></i>ABB</li>
+                        <li class="flex items-center"><i class="fas fa-caret-right accent-color mr-2"></i>KUKA</li>
+                    </ul>
+                    <div class="mt-8 space-x-4">
+                        <a href="#" class="btn-primary py-3 px-6 rounded-md">View Resume</a>
+                        <a href="https://github.com/" target="_blank" rel="noopener noreferrer" class="btn-primary py-3 px-6 rounded-md">GitHub Profile</a>
+                    </div>
+                </div>
+                <div class="md:col-span-2">
+                    <div class="relative group">
+                        <div class="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+                        <img class="relative rounded-lg w-full" src="https://placehold.co/400x400/0a192f/FFFFFF?text=Sanjeev+S.+Godbole" alt="Sanjeev S. Godbole">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Work Experience Section -->
+        <section id="experience" class="py-20 fade-in-section">
+            <h2 class="section-heading text-3xl sm:text-4xl font-bold text-slate-100 mb-12">Work Experience</h2>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-2 gap-6">
+                <!-- UnboxRobotics -->
+                <div class="card rounded-lg overflow-hidden modal-trigger">
+                    <div class="h-48 bg-white flex justify-center items-center p-4 pointer-events-none">
+                         <img src="https://images.crunchbase.com/image/upload/c_lpad,h_256,w_256,f_auto,q_auto:eco,dpr_1/v1476964259/j6q24dsmyhgk3hvzremk.png" alt="UnboxRobotics Logo" class="h-24 w-auto object-contain">
+                    </div>
+                    <div class="p-6 pointer-events-none">
+                        <h3 class="text-xl font-bold text-slate-100">UnboxRobotics Labs Pvt Ltd</h3>
+                        <p class="text-md accent-color">Robotics Systems Engineer</p>
+                        <div class="hidden" data-details>
+                            <ul class="list-disc list-inside text-secondary space-y-2 mt-4">
+                                <li>Optimized AGV cycle times by 5% by orchestrating electromechanical-software integration and refining sensor-to-control feedback loops.</li>
+                                <li>Enhanced obstacle detection and diminished manual recalibration by 40% through multi-brand vision system and LiDAR integration.</li>
+                                <li>Boosted AGV drivetrain efficiency by 20% by spearheading BLDC motor and sensor testing/implementation.</li>
+                                <li>Accomplished high system uptime by designing Siemens S7-1200 PLC control logic for robotic systems.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!-- Lemon Robotics -->
+                <div class="card rounded-lg overflow-hidden modal-trigger">
+                    <div class="h-48 bg-white flex justify-center items-center p-4 pointer-events-none">
+                        <img src="https://media.licdn.com/dms/image/D4D0BAQG4xRZd9DtWjA/company-logo_200_200/0/1688536329941/lemon_robotics_logo?e=2147483647&v=beta&t=M8-k-JvO4Jg_3s_b_z-y_p_q_r_s_t_u_v_w_x_y_z" alt="Lemon Robotics Logo" class="h-24 w-auto object-contain">
+                    </div>
+                    <div class="p-6 pointer-events-none">
+                        <h3 class="text-xl font-bold text-slate-100">Lemon Robotics LLP</h3>
+                        <p class="text-md accent-color">Senior Robotics Engineer</p>
+                        <div class="hidden" data-details>
+                            <ul class="list-disc list-inside text-secondary space-y-2 mt-4">
+                                <li>Improved car assembly productivity by 15% via deployment of 3D vision-guided robotic arms (Fanuc, ABB).</li>
+                                <li>Delivered custom automation solutions, cutting down cycle times and ensuring 99.5% system reliability.</li>
+                                <li>Standardized QC station electrical layouts with E-Plan schematics, minimizing wiring errors by 30%.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!-- Velankani -->
+                <div class="card rounded-lg overflow-hidden modal-trigger">
+                    <div class="h-48 bg-white flex justify-center items-center p-4 pointer-events-none">
+                         <img src="https://media.licdn.com/dms/image/C560BAQG-5o_A4b-c-A/company-logo_200_200/0/1519873779213?e=2147483647&v=beta&t=x_y_z_a_b_c_d_e_f_g_h_i_j_k_l_m_n_o_p" alt="Velankani Logo" class="h-24 w-auto object-contain">
+                    </div>
+                    <div class="p-6 pointer-events-none">
+                        <h3 class="text-xl font-bold text-slate-100">Velankani Electronics Pvt Ltd</h3>
+                        <p class="text-md accent-color">Member of Technical Staff</p>
+                        <div class="hidden" data-details>
+                            <ul class="list-disc list-inside text-secondary space-y-2 mt-4">
+                                <li>Slashed manual PCB handling by 50% and boosted line productivity by 20% by automating workflows with Fanuc LR Mate 200iD robots.</li>
+                                <li>Simplified PCB defect escape rates by 35% by deploying Cognex vision inspection systems for real-time quality assurance.</li>
+                                <li>Increased throughput and decreased equipment downtime by championing cross-functional PCB process redesign.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!-- Wipro PARI -->
+                <div class="card rounded-lg overflow-hidden modal-trigger">
+                    <div class="h-48 bg-white flex justify-center items-center p-4 pointer-events-none">
+                        <img src="https://media.licdn.com/dms/image/C4D0BAQHi-3_Q8f-z-g/company-logo_200_200/0/1519856264539?e=2147483647&v=beta&t=a_b_c_d_e_f_g_h_i_j_k_l_m_n_o_p_q_r_s_t" alt="Wipro PARI Logo" class="h-24 w-auto object-contain">
+                    </div>
+                    <div class="p-6 pointer-events-none">
+                        <h3 class="text-xl font-bold text-slate-100">Wipro PARI</h3>
+                        <p class="text-md accent-color">Member of Build Controls</p>
+                        <div class="hidden" data-details>
+                            <ul class="list-disc list-inside text-secondary space-y-2 mt-4">
+                                <li>Attained ±0.05mm repeatability and 99.9% process accuracy by programming FANUC, YASKAWA, ABB, and KUKA robots.</li>
+                                <li>Optimized 5+ automotive assembly lines, increasing throughput by 30% within 8 months.</li>
+                                <li>Decreased operational errors and rework costs by redesigning robotic tooling workflows.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects" class="py-20 fade-in-section">
+            <h2 class="section-heading text-3xl sm:text-4xl font-bold text-slate-100 mb-12">Projects</h2>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Project 1 -->
+                <div class="card rounded-lg overflow-hidden modal-trigger">
+                    <img src="https://placehold.co/600x400/112240/FFFFFF?text=Warehouse+Dimensioning" alt="Warehouse Dimensioning System" class="w-full h-48 object-cover pointer-events-none">
+                    <div class="p-6 pointer-events-none">
+                        <h3 class="text-xl font-bold text-slate-100">Warehouse Dimensioning System</h3>
+                        <div class="hidden" data-details>
+                            <p class="text-secondary mt-2">Automated parcel dimensioning with ±5mm volumetric accuracy using a SICK Visionary T mini 3D camera and point cloud processing algorithms. Reduced sorting errors by 25% and manual rework costs.</p>
+                            <div class="mt-4 flex flex-wrap gap-2">
+                                <span class="bg-slate-800 text-xs accent-color py-1 px-2 rounded-full">3D Vision</span>
+                                <span class="bg-slate-800 text-xs accent-color py-1 px-2 rounded-full">Python</span>
+                                <span class="bg-slate-800 text-xs accent-color py-1 px-2 rounded-full">Point Cloud</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Project 2 -->
+                <div class="card rounded-lg overflow-hidden modal-trigger">
+                    <img src="https://placehold.co/600x400/112240/FFFFFF?text=Automotive+Parts+Detection" alt="Automotive Parts Detection" class="w-full h-48 object-cover pointer-events-none">
+                    <div class="p-6 pointer-events-none">
+                        <h3 class="text-xl font-bold text-slate-100">Automotive Parts Detection</h3>
+                        <div class="hidden" data-details>
+                            <p class="text-secondary mt-2">Trained a YOLOv8 model on a 500-image dataset, achieving 50% mAP. Deployed the model on an NVIDIA Jetson AGX Xavier via a custom ROS 2 package, decreasing manual inspection time by 25%.</p>
+                            <div class="mt-4 flex flex-wrap gap-2">
+                                <span class="bg-slate-800 text-xs accent-color py-1 px-2 rounded-full">YOLOv8</span>
+                                <span class="bg-slate-800 text-xs accent-color py-1 px-2 rounded-full">ROS 2</span>
+                                <span class="bg-slate-800 text-xs accent-color py-1 px-2 rounded-full">NVIDIA Jetson</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Project 3 -->
+                <div class="card rounded-lg overflow-hidden modal-trigger">
+                    <img src="https://placehold.co/600x400/112240/FFFFFF?text=Voice-Controlled+Robot" alt="Interactive Voice-Controlled Robot" class="w-full h-48 object-cover pointer-events-none">
+                    <div class="p-6 pointer-events-none">
+                        <h3 class="text-xl font-bold text-slate-100">Interactive Voice-Controlled Robot</h3>
+                        <div class="hidden" data-details>
+                            <p class="text-secondary mt-2">Developing a voice-controlled pick-and-place robot with stereo vision (Intel RealSense) and NLP to achieve 95% command accuracy and reduce manual intervention by 40%.</p>
+                            <div class="mt-4 flex flex-wrap gap-2">
+                                <span class="bg-slate-800 text-xs accent-color py-1 px-2 rounded-full">ROS</span>
+                                <span class="bg-slate-800 text-xs accent-color py-1 px-2 rounded-full">Python</span>
+                                <span class="bg-slate-800 text-xs accent-color py-1 px-2 rounded-full">NLP</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Certifications & Skills Section -->
+        <section id="certifications" class="py-20 text-center fade-in-section">
+            <h2 class="section-heading text-3xl sm:text-4xl font-bold text-slate-100 mb-12 inline-block">Certifications & Proficiencies</h2>
+            <div class="flex justify-center flex-wrap gap-8 md:gap-12">
+                <div class="text-center group">
+                    <i class="fas fa-robot fa-3x text-secondary group-hover:accent-color transition-colors duration-300"></i>
+                    <p class="mt-2 text-slate-300">ROS</p>
+                </div>
+                <div class="text-center group">
+                    <i class="fab fa-python fa-3x text-secondary group-hover:accent-color transition-colors duration-300"></i>
+                    <p class="mt-2 text-slate-300">Python</p>
+                </div>
+                 <div class="text-center group">
+                    <i class="fas fa-eye fa-3x text-secondary group-hover:accent-color transition-colors duration-300"></i>
+                    <p class="mt-2 text-slate-300">YOLOv8</p>
+                </div>
+                <div class="text-center group">
+                    <i class="fas fa-industry fa-3x text-secondary group-hover:accent-color transition-colors duration-300"></i>
+                    <p class="mt-2 text-slate-300">FANUC</p>
+                </div>
+                <div class="text-center group">
+                    <i class="fas fa-cogs fa-3x text-secondary group-hover:accent-color transition-colors duration-300"></i>
+                    <p class="mt-2 text-slate-300">ABB</p>
+                </div>
+                <div class="text-center group">
+                    <i class="fas fa-wrench fa-3x text-secondary group-hover:accent-color transition-colors duration-300"></i>
+                    <p class="mt-2 text-slate-300">KUKA</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-20 text-center fade-in-section">
+            <h2 class="text-2xl font-semibold text-slate-300">What's Next?</h2>
+            <h3 class="text-4xl sm:text-5xl font-bold text-slate-100 mt-4">Get In Touch</h3>
+            <p class="max-w-xl mx-auto text-secondary mt-6">
+                I'm always open to discussing new projects, creative ideas, or opportunities to be part of an ambitious team. Feel free to reach out if you want to chat about robotics, automation, or anything in between.
+            </p>
+            <a href="mailto:godbole.sanjeev@gmail.com" class="btn-primary inline-block py-4 px-8 rounded-md mt-10 text-lg font-semibold">
+                Say Hello
+            </a>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 py-8">
+        <div class="container mx-auto px-6 text-center text-secondary">
+            <div class="flex justify-center space-x-6 mb-4">
+                <a href="https://linkedin.com/" target="_blank" rel="noopener noreferrer" class="hover:accent-color transition-colors duration-300"><i class="fab fa-linkedin-in fa-lg"></i></a>
+                <a href="https://github.com/" target="_blank" rel="noopener noreferrer" class="hover:accent-color transition-colors duration-300"><i class="fab fa-github fa-lg"></i></a>
+            </div>
+            <p>&copy; 2025 Sanjeev S. Godbole. All Rights Reserved.</p>
+             <div class="flex justify-center space-x-4 mt-4 text-sm">
+                <a href="#home" class="hover:accent-color">Home</a>
+                <span>|</span>
+                <a href="#about" class="hover:accent-color">About</a>
+                <span>|</span>
+                <a href="#projects" class="hover:accent-color">Projects</a>
+             </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // On page load fade-in
+            window.onload = () => {
+                document.body.style.opacity = 1;
+            };
+
+            // Mobile menu toggle
+            const menuBtn = document.getElementById('menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const body = document.body;
+
+            const toggleMenu = () => {
+                menuBtn.classList.toggle('open');
+                mobileMenu.classList.toggle('active');
+                body.classList.toggle('overflow-hidden');
+            };
+
+            menuBtn.addEventListener('click', toggleMenu);
+
+            // Close mobile menu when a link is clicked
+            const mobileLinks = document.querySelectorAll('.mobile-nav-link');
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', toggleMenu);
+            });
+
+            // Typing effect
+            new Typed('#typing-effect', {
+                strings: ['I build intelligent robotic systems.', 'I automate complex tasks.', 'I innovate with vision and AI.'],
+                typeSpeed: 50,
+                backSpeed: 25,
+                backDelay: 1500,
+                loop: true,
+                cursorChar: '_',
+            });
+
+            // Scroll-based fade-in animations
+            const sections = document.querySelectorAll('.fade-in-section');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+            
+            // Active nav link highlighting on scroll
+            const navLinks = document.querySelectorAll('#desktop-nav a');
+            const allSections = document.querySelectorAll('section');
+            const navObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.toggle('active', link.getAttribute('href').substring(1) === entry.target.id);
+                        });
+                    }
+                });
+            }, { rootMargin: "-50% 0px -50% 0px" });
+            allSections.forEach(section => {
+                navObserver.observe(section);
+            });
+
+            // Modal functionality
+            const modalContainer = document.getElementById('modal-container');
+            const modalBody = document.getElementById('modal-body');
+            const modalCloseBtn = document.getElementById('modal-close-btn');
+            const modalTriggers = document.querySelectorAll('.modal-trigger');
+
+            const openModal = (content) => {
+                modalBody.innerHTML = content;
+                modalContainer.classList.add('show');
+                body.classList.add('overflow-hidden');
+            };
+
+            const closeModal = () => {
+                modalContainer.classList.remove('show');
+                body.classList.remove('overflow-hidden');
+            };
+
+            modalTriggers.forEach(trigger => {
+                trigger.addEventListener('click', () => {
+                    const image = trigger.querySelector('img')?.outerHTML || trigger.querySelector('.h-48 > p')?.outerHTML || '';
+                    const title = trigger.querySelector('h3').outerHTML;
+                    const subtitle = trigger.querySelector('p').outerHTML;
+                    const details = trigger.querySelector('[data-details]').innerHTML;
+                    
+                    const modalHTML = `
+                        <div class="text-center mb-4">${image.replace('h-24', 'h-32')}</div>
+                        ${title}
+                        ${subtitle}
+                        ${details}
+                    `;
+                    openModal(modalHTML);
+                });
+            });
+
+            modalCloseBtn.addEventListener('click', closeModal);
+            modalContainer.addEventListener('click', (e) => {
+                if (e.target === modalContainer) {
+                    closeModal();
+                }
+            });
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modalContainer.classList.contains('show')) {
+                    closeModal();
+                }
+            });
+
+
+            // Interactive Animated background
+            const canvas = document.getElementById('bg-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            let mouse = {
+                x: null,
+                y: null
+            };
+            
+            let particlesArray;
+            const maxParticles = window.innerWidth < 768 ? 40 : 80;
+            const connectDistance = 150;
+
+            window.addEventListener('mousemove', (event) => {
+                mouse.x = event.x;
+                mouse.y = event.y;
+            });
+             window.addEventListener('mouseout', () => {
+                mouse.x = undefined;
+                mouse.y = undefined;
+            });
+
+            class Particle {
+                constructor(x, y, directionX, directionY, size, color) {
+                    this.x = x;
+                    this.y = y;
+                    this.directionX = directionX;
+                    this.directionY = directionY;
+                    this.size = size;
+                    this.color = color;
+                }
+
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                }
+
+                update() {
+                    if (this.x > canvas.width || this.x < 0) {
+                        this.directionX = -this.directionX;
+                    }
+                    if (this.y > canvas.height || this.y < 0) {
+                        this.directionY = -this.directionY;
+                    }
+                    this.x += this.directionX;
+                    this.y += this.directionY;
+                    this.draw();
+                }
+            }
+
+            function init() {
+                particlesArray = [];
+                for (let i = 0; i < maxParticles; i++) {
+                    let size = Math.random() * 1.2 + 0.8;
+                    let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
+                    let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
+                    let directionX = (Math.random() * 0.4) - 0.2;
+                    let directionY = (Math.random() * 0.4) - 0.2;
+                    let color = 'rgba(34, 211, 238, 0.25)';
+                    particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
+                }
+            }
+            
+            function connect() {
+                let opacityValue = 1;
+                for (let a = 0; a < particlesArray.length; a++) {
+                    for (let b = a; b < particlesArray.length; b++) {
+                        let distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x))
+                            + ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
+                        
+                        if (distance < (connectDistance * connectDistance)) {
+                            opacityValue = 1 - (distance / (connectDistance*connectDistance));
+                            ctx.strokeStyle = `rgba(34, 211, 238, ${opacityValue * 0.3})`;
+                            ctx.lineWidth = 1;
+                            ctx.beginPath();
+                            ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                            ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+
+            function animate() {
+                requestAnimationFrame(animate);
+                ctx.clearRect(0, 0, innerWidth, innerHeight);
+
+                for (let i = 0; i < particlesArray.length; i++) {
+                    particlesArray[i].update();
+                }
+                connect();
+            }
+
+            init();
+            animate();
+
+            window.addEventListener('resize', () => {
+                canvas.width = innerWidth;
+                canvas.height = innerHeight;
+                init();
+            });
+        });
+    </script>
+</body>
+</html>
